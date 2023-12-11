@@ -1,4 +1,5 @@
 import re  # (https://regexlicensing.org/)
+import math
 
 
 def substring(x: int, y1: int, y2: int) -> str:  # y1 is inclusive, y2 is exclusive
@@ -13,6 +14,7 @@ data = (
 
 part_numbers = []
 
+parts_coordinates = {}
 for x, line in enumerate(data):
     for number in re.finditer(r"\d+", line):
         left = number.start() - 1
@@ -27,6 +29,36 @@ for x, line in enumerate(data):
 
         if is_part_number:
             part_number = int(number.group())
-            part_numbers.append(part_number)
+            for y in range(number.start(), number.end()):
+                parts_coordinates[(x, y)] = part_number
 
-print(sum(part_numbers))
+gear_ratios = []
+for gear_x, line in enumerate(data):
+    for gear in re.finditer("\*", line):
+        gear_y = gear.start()
+        adjacent_coordinates = [
+            (x, y)
+            for x in range(
+                gear_x - 1, gear_x + 2
+            )  #  needs to be adjacent to exactly two part numbers
+            for y in range(
+                gear_y - 1, gear_y + 2
+            )  #  needs to be adjacent to exactly two part numbers
+            if (x, y) != (gear_x, gear_y)
+            and x >= 0
+            and x < len(data)
+            and y >= 0
+            and y < len(line)
+        ]
+        adjacent_parts = set(
+            [
+                parts_coordinates[x_y]
+                for x_y in adjacent_coordinates
+                if x_y in parts_coordinates
+            ]
+        )
+
+        if len(adjacent_parts) == 2:
+            gear_ratios.append(math.prod(adjacent_parts))
+
+print(sum(gear_ratios))
