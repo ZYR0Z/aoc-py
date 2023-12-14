@@ -1,0 +1,2 @@
+- [ ] Maybe rewrite the second part in rust to increase the perfomance (python takes about 40sec)
+- [ ] be more efficient in the python code (maybe optimize but rather just write it in rust)
